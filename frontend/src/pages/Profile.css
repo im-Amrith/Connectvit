@@ -1,0 +1,117 @@
+.connections-section {
+  background-color: #111;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.connections-header {
+  display: flex;
+  border-bottom: 1px solid #333;
+  margin-bottom: 20px;
+}
+
+.connection-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  flex: 1;
+  text-align: center;
+}
+
+.connection-tab:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.connection-tab.active {
+  border-bottom: 3px solid #1890ff;
+}
+
+.connection-count {
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 5px;
+}
+
+.connection-label {
+  font-size: 14px;
+  color: #999;
+}
+
+.connections-content {
+  min-height: 200px;
+}
+
+.connection-title {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: white;
+}
+
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #222;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.user-item:hover {
+  background-color: #333;
+}
+
+.user-avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #1890ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-fullname {
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-username {
+  font-size: 12px;
+  color: #999;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.no-connections, .connection-prompt {
+  text-align: center;
+  color: #999;
+  padding: 30px 0;
+} 

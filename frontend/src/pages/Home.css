@@ -1,0 +1,66 @@
+.home-shell {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.home-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.aurora {
+  position: absolute;
+  width: clamp(320px, 45vw, 720px);
+  height: clamp(320px, 45vw, 720px);
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.55;
+  animation: auroraFloat 20s ease-in-out infinite alternate;
+}
+
+.aurora-one {
+  top: -10%;
+  left: -12%;
+  background: radial-gradient(circle, rgba(99, 135, 255, 0.55), rgba(5, 7, 24, 0));
+}
+
+.aurora-two {
+  top: 15%;
+  right: -8%;
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.5), rgba(5, 7, 24, 0));
+  animation-duration: 24s;
+}
+
+.aurora-three {
+  bottom: -12%;
+  left: 18%;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.35), rgba(5, 7, 24, 0));
+  animation-duration: 28s;
+}
+
+.home-page-grid {
+  position: relative;
+  z-index: 1;
+  padding: clamp(20px, 4vw, 60px);
+  gap: clamp(24px, 3vw, 48px);
+}
+
+@keyframes auroraFloat {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(40px, -25px, 0) scale(1.08);
+  }
+}
+
+@media (max-width: 1024px) {
+  .home-page-grid {
+    padding: 24px 16px 48px;
+  }
+}
+
