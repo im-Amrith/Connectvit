@@ -45,7 +45,7 @@ function SignUp() {
     }
 
     try {
-      const response = await fetch('http://localhost:5010/api/signup', {
+      const response = await fetch('https://im-amrith-connectvit.hf.space/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fullName, username, email, password }),
