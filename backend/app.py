@@ -1,6 +1,6 @@
 import eventlet
 eventlet.monkey_patch()
-
+import time
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room
@@ -65,10 +65,27 @@ class PostgresCursor:
 
 def get_db_connection():
     if DATABASE_URL:
-        conn = psycopg2.connect(DATABASE_URL)
-        return conn
+        # Try to connect up to 3 times
+        for attempt in range(3):
+            try:
+                # Add Keepalives to prevent "SSL Closed" errors
+                conn = psycopg2.connect(
+                    DATABASE_URL, 
+                    sslmode='require', 
+                    connect_timeout=10,
+                    keepalives=1, 
+                    keepalives_idle=5, 
+                    keepalives_interval=2, 
+                    keepalives_count=2
+                )
+                return conn
+            except psycopg2.OperationalError as e:
+                print(f"Connection attempt {attempt+1} failed: {e}")
+                if attempt == 2: # If it's the last attempt, give up and raise the error
+                    raise e
+                time.sleep(1) # Wait 1 second before retrying
     else:
-        return sqlite3.connect(DB_PATH)
+        return sqlite3.connect(DB_PATH)        
 
 def get_cursor(conn):
     if DATABASE_URL:
