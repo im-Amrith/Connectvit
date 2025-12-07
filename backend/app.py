@@ -33,6 +33,10 @@ app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+@app.route('/')
+def home():
+    return "ConnectVit Backend is Running!", 200
+
 class PostgresCursor:
     def __init__(self, cursor):
         self.cursor = cursor
