@@ -1,5 +1,7 @@
 from gevent import monkey
 monkey.patch_all()
+from psycogreen.gevent import patch_psycopg
+patch_psycopg()
 import time
 from flask import Flask, request, jsonify
 from flask_cors import CORS
