@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log("Attempting login with:", { username, password });
       
-      const response = await fetch('http://localhost:5010/api/login', {
+      const response = await fetch('https://im-amrith-connectvit.hf.space/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
