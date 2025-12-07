@@ -17,14 +17,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__)
-CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
-
 # Database Setup
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "connect.db")
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    print(f"✅ Configured to use PostgreSQL: {DATABASE_URL.split('@')[1]}")
+else:
+    print("⚠️ Configured to use local SQLite")
+
+app = Flask(__name__)
+CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 class PostgresCursor:
     def __init__(self, cursor):
@@ -71,6 +76,12 @@ def get_db_connection():
         for attempt in range(3):
             try:
                 # Add Keepalives to prevent "SSL Closed" errors
+                # For Supabase Transaction Pooler (port 6543), SSL is required but sometimes 'require' is too strict for the pooler handshake
+                # Try 'prefer' or just rely on the URL params if possible.
+                # Also, ensure the URL is the Transaction Pooler URL (port 6543) for IPv4 compatibility if needed, 
+                # OR the Session Pooler (port 5432) if using IPv4 addon.
+                # Hugging Face Spaces are IPv4 only.
+                
                 conn = psycopg2.connect(
                     DATABASE_URL, 
                     sslmode='require', 
