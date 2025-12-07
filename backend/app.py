@@ -65,7 +65,7 @@ class PostgresCursor:
 
 def get_db_connection():
     if DATABASE_URL:
-        conn = psycopg2.connect(DATABASE_URL)
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         return conn
     else:
         return sqlite3.connect(DB_PATH)
