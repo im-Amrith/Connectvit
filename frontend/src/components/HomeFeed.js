@@ -12,16 +12,24 @@ export default function HomeFeed() {
     loadPosts();
   }, [currentUser]);
 
-  const loadPosts = () => {
+  const loadPosts = async () => {
     try {
       setLoading(true);
       
-      const savedPosts = localStorage.getItem('posts');
-      const allPosts = savedPosts ? JSON.parse(savedPosts) : [];
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5010';
+      const response = await fetch(`${API_URL}/api/posts`);
       
-      allPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      if (response.ok) {
+        const allPosts = await response.json();
+        setPosts(allPosts);
+      } else {
+        // Fallback to local storage if API fails (or for offline demo)
+        const savedPosts = localStorage.getItem('posts');
+        const allPosts = savedPosts ? JSON.parse(savedPosts) : [];
+        allPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        setPosts(allPosts);
+      }
       
-      setPosts(allPosts);
       setLoading(false);
     } catch (error) {
       console.error('Error loading posts:', error);

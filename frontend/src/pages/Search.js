@@ -39,7 +39,8 @@ function Search() {
     const fetchSuggestions = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5010/api/users');
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5010';
+        const response = await fetch(`${API_URL}/api/users`);
         if (response.ok) {
           const users = await response.json();
           // Filter out current user and limit to 6 suggestions

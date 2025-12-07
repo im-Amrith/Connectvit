@@ -177,6 +177,18 @@ def create_tables():
         )
     ''')
 
+    # Posts Table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS posts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            caption TEXT,
+            image_url TEXT,
+            timestamp TEXT NOT NULL,
+            likes INTEGER DEFAULT 0
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -568,12 +580,12 @@ def create_group():
              cursor.execute('''
                 INSERT INTO group_members (group_id, username, joined_at, is_admin)
                 VALUES (%s, %s, %s, %s)
-            ''', (group_id, created_by, created_at, True))
+            ''', (group_id, created_by, created_at, 1))
         else:
             cursor.execute('''
                 INSERT INTO group_members (group_id, username, joined_at, is_admin)
                 VALUES (?, ?, ?, ?)
-            ''', (group_id, created_by, created_at, True))
+            ''', (group_id, created_by, created_at, 1))
         
         conn.commit()
         conn.close()
@@ -899,6 +911,77 @@ def update_bio():
         
     except Exception as e:
         return jsonify({"error": "Failed to update bio", "details": str(e)}), 500
+
+# ========== Posts ==========
+
+@app.route('/api/posts', methods=['GET'])
+def get_posts():
+    try:
+        conn = get_db_connection()
+        cursor = get_cursor(conn)
+        cursor.execute('SELECT * FROM posts ORDER BY timestamp DESC')
+        posts = cursor.fetchall()
+        conn.close()
+
+        post_list = []
+        for post in posts:
+            post_list.append({
+                "id": post[0],
+                "username": post[1],
+                "caption": post[2],
+                "image_url": post[3],
+                "timestamp": post[4],
+                "likes": post[5]
+            })
+        return jsonify(post_list), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch posts", "details": str(e)}), 500
+
+@app.route('/api/posts/create', methods=['POST'])
+def create_post():
+    try:
+        data = request.json
+        username = data.get("username")
+        caption = data.get("caption")
+        image_url = data.get("image_url")
+        
+        if not username or not image_url:
+            return jsonify({"error": "Username and image are required"}), 400
+            
+        timestamp = datetime.now().isoformat()
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        if DATABASE_URL:
+            cursor.execute('''
+                INSERT INTO posts (username, caption, image_url, timestamp, likes)
+                VALUES (%s, %s, %s, %s, %s) RETURNING id
+            ''', (username, caption, image_url, timestamp, 0))
+            post_id = cursor.fetchone()[0]
+        else:
+            cursor.execute('''
+                INSERT INTO posts (username, caption, image_url, timestamp, likes)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (username, caption, image_url, timestamp, 0))
+            post_id = cursor.lastrowid
+            
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            "message": "Post created successfully",
+            "post": {
+                "id": post_id,
+                "username": username,
+                "caption": caption,
+                "image_url": image_url,
+                "timestamp": timestamp,
+                "likes": 0
+            }
+        }), 201
+    except Exception as e:
+        return jsonify({"error": "Failed to create post", "details": str(e)}), 500
 
 # ========== Run ==========
 

@@ -44,47 +44,37 @@ function CreatePost({ onPostCreated }) {
     setLoading(true);
     
     try {
-      // In a real app, you would upload the image to a server here
-      // For this demo, we'll just create a post object with the data we have
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5010';
       
-      const newPost = {
-        id: Date.now().toString(),
-        userId: currentUser.id,
-        username: currentUser.username,
-        userFullName: currentUser.full_name,
-        imageUrl: imagePreview, // Using the base64 preview as the image URL for demo
-        caption: caption,
-        timestamp: new Date().toISOString(),
-        likes: [],
-        comments: []
-      };
-      
-      // Get existing posts from localStorage or create empty array
-      const savedPosts = localStorage.getItem('posts');
-      const posts = savedPosts ? JSON.parse(savedPosts) : [];
-      
-      // Add new post to posts array
-      const updatedPosts = [newPost, ...posts];
-      
-      // Save updated posts to localStorage
-      localStorage.setItem('posts', JSON.stringify(updatedPosts));
-      
-      // Create notifications for followers
-      createFollowersNotifications(newPost);
-      
-      // Reset form
-      setCaption('');
-      setImageURL('');
-      setImagePreview(null);
-      setError('');
-      
-      // Notify parent component about the new post
-      if (onPostCreated) {
-        onPostCreated(newPost);
+      const response = await fetch(`${API_URL}/api/posts/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: currentUser.username,
+          caption: caption,
+          image_url: imageURL
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (onPostCreated) {
+          onPostCreated(data.post);
+        }
+        
+        // Reset form
+        setCaption('');
+        setImageURL('');
+        setImagePreview(null);
+        setError('');
+      } else {
+        setError('Failed to create post');
       }
-    } catch (error) {
-      console.error('Error creating post:', error);
-      setError('Failed to create post. Try again.');
+    } catch (err) {
+      console.error("Error creating post:", err);
+      setError('Failed to create post');
     } finally {
       setLoading(false);
     }
