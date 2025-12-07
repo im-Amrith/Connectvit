@@ -1,5 +1,5 @@
-import eventlet
-eventlet.monkey_patch()
+from gevent import monkey
+monkey.patch_all()
 import time
 from flask import Flask, request, jsonify
 from flask_cors import CORS

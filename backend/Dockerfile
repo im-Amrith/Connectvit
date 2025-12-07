@@ -15,4 +15,4 @@ ENV PATH="/home/user/.local/bin:$PATH"
 # Hugging Face Spaces expects the app to listen on port 7860
 ENV PORT=7860
 
-CMD ["gunicorn", "-k", "eventlet", "-w", "1", "--bind", "0.0.0.0:7860", "app:app"]
+CMD ["gunicorn", "-k", "geventwebsocket.gunicorn.workers.GeventWebSocketWorker", "-w", "1", "--bind", "0.0.0.0:7860", "app:app"]
