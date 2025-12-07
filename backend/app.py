@@ -21,6 +21,8 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "connect.db")
 DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.strip()
 
 if DATABASE_URL:
     print(f"✅ Configured to use PostgreSQL: {DATABASE_URL.split('@')[1]}")
