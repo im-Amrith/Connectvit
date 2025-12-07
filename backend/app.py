@@ -184,8 +184,19 @@ def create_tables():
             username TEXT NOT NULL,
             caption TEXT,
             image_url TEXT,
+            timestamp TEXT NOT NULL
+        )
+    ''')
+    
+    # Post Likes Table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS post_likes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            post_id INTEGER NOT NULL,
+            username TEXT NOT NULL,
             timestamp TEXT NOT NULL,
-            likes INTEGER DEFAULT 0
+            FOREIGN KEY (post_id) REFERENCES posts (id),
+            UNIQUE (post_id, username)
         )
     ''')
 
@@ -921,18 +932,23 @@ def get_posts():
         cursor = get_cursor(conn)
         cursor.execute('SELECT * FROM posts ORDER BY timestamp DESC')
         posts = cursor.fetchall()
-        conn.close()
-
+        
         post_list = []
         for post in posts:
+            # Get likes for this post
+            cursor.execute('SELECT username FROM post_likes WHERE post_id = ?', (post[0],))
+            likes = [row[0] for row in cursor.fetchall()]
+            
             post_list.append({
                 "id": post[0],
                 "username": post[1],
                 "caption": post[2],
                 "image_url": post[3],
                 "timestamp": post[4],
-                "likes": post[5]
+                "likes": likes
             })
+        
+        conn.close()
         return jsonify(post_list), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch posts", "details": str(e)}), 500
@@ -955,15 +971,15 @@ def create_post():
         
         if DATABASE_URL:
             cursor.execute('''
-                INSERT INTO posts (username, caption, image_url, timestamp, likes)
-                VALUES (%s, %s, %s, %s, %s) RETURNING id
-            ''', (username, caption, image_url, timestamp, 0))
+                INSERT INTO posts (username, caption, image_url, timestamp)
+                VALUES (%s, %s, %s, %s) RETURNING id
+            ''', (username, caption, image_url, timestamp))
             post_id = cursor.fetchone()[0]
         else:
             cursor.execute('''
-                INSERT INTO posts (username, caption, image_url, timestamp, likes)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (username, caption, image_url, timestamp, 0))
+                INSERT INTO posts (username, caption, image_url, timestamp)
+                VALUES (?, ?, ?, ?)
+            ''', (username, caption, image_url, timestamp))
             post_id = cursor.lastrowid
             
         conn.commit()
@@ -977,11 +993,55 @@ def create_post():
                 "caption": caption,
                 "image_url": image_url,
                 "timestamp": timestamp,
-                "likes": 0
+                "likes": []
             }
         }), 201
     except Exception as e:
         return jsonify({"error": "Failed to create post", "details": str(e)}), 500
+
+@app.route('/api/posts/<int:post_id>/like', methods=['POST'])
+def like_post(post_id):
+    try:
+        data = request.json
+        username = data.get("username")
+        
+        if not username:
+            return jsonify({"error": "Username is required"}), 400
+            
+        conn = get_db_connection()
+        cursor = get_cursor(conn)
+        
+        # Check if already liked
+        cursor.execute('SELECT * FROM post_likes WHERE post_id = ? AND username = ?', (post_id, username))
+        existing_like = cursor.fetchone()
+        
+        if existing_like:
+            # Unlike
+            cursor.execute('DELETE FROM post_likes WHERE post_id = ? AND username = ?', (post_id, username))
+            action = "unliked"
+        else:
+            # Like
+            timestamp = datetime.now().isoformat()
+            if DATABASE_URL:
+                cursor.execute('INSERT INTO post_likes (post_id, username, timestamp) VALUES (%s, %s, %s)', (post_id, username, timestamp))
+            else:
+                cursor.execute('INSERT INTO post_likes (post_id, username, timestamp) VALUES (?, ?, ?)', (post_id, username, timestamp))
+            action = "liked"
+            
+        conn.commit()
+        
+        # Get updated likes list
+        cursor.execute('SELECT username FROM post_likes WHERE post_id = ?', (post_id,))
+        likes = [row[0] for row in cursor.fetchall()]
+        
+        conn.close()
+        
+        return jsonify({
+            "message": f"Post {action} successfully",
+            "likes": likes
+        }), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to like/unlike post", "details": str(e)}), 500
 
 # ========== Run ==========
 
