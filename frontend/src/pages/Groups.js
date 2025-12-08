@@ -304,7 +304,7 @@ function Groups() {
   // Fetch group messages
   const fetchGroupMessages = async (groupId) => {
     try {
-      const response = await axios.get(`http://localhost:5010/api/groups/${groupId}/messages`);
+      const response = await axios.get(`${API_URL}/api/groups/${groupId}/messages`);
       setGroupMessages(response.data);
     } catch (err) {
       console.error('Error fetching group messages:', err);
@@ -318,7 +318,7 @@ function Groups() {
     if (!newMemberUsername.trim() || !selectedGroup) return;
     
     try {
-      await axios.post(`http://localhost:5010/api/groups/${selectedGroup.id}/members`, {
+      await axios.post(`${API_URL}/api/groups/${selectedGroup.id}/members`, {
         username: newMemberUsername,
         added_by: currentUser.username
       });
@@ -340,7 +340,7 @@ function Groups() {
     
     try {
       // Fetch group details to get members
-      const detailsResponse = await axios.get(`http://localhost:5010/api/groups/${group.id}`);
+      const detailsResponse = await axios.get(`${API_URL}/api/groups/${group.id}`);
       // Update the selected group with members from the response
       setSelectedGroup(prev => ({
         ...prev,
@@ -349,7 +349,7 @@ function Groups() {
       setGroupMembers(detailsResponse.data.members || []);
       
       // Fetch group messages
-      const messagesResponse = await axios.get(`http://localhost:5010/api/groups/${group.id}/messages`);
+      const messagesResponse = await axios.get(`${API_URL}/api/groups/${group.id}/messages`);
       setGroupMessages(messagesResponse.data || []);
     } catch (err) {
       console.error('Error fetching group data:', err);
