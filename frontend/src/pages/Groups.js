@@ -4,6 +4,7 @@ import { useAuth } from '../components/AuthContext';
 import LeftPanel from '../components/LeftPanel';
 import RightPanel from '../components/RightPanel';
 import axios from 'axios';
+import io from 'socket.io-client';
 import './Groups.css';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 
@@ -31,6 +32,35 @@ function Groups() {
   const messageInputRef = useRef(null);
   const [groupMembers, setGroupMembers] = useState([]);
   const [newMemberUsername, setNewMemberUsername] = useState('');
+  const socket = useRef(null);
+
+  // Initialize Socket.IO
+  useEffect(() => {
+    socket.current = io(API_URL);
+    
+    return () => {
+      if (socket.current) socket.current.disconnect();
+    };
+  }, []);
+
+  // Listen for incoming messages
+  useEffect(() => {
+    if (!socket.current) return;
+
+    socket.current.on('receive_group_message', (newMessage) => {
+      if (selectedGroup && newMessage.group_id === selectedGroup.id) {
+        setGroupMessages((prevMessages) => {
+          // Avoid duplicates
+          if (prevMessages.some(m => m.id === newMessage.id)) return prevMessages;
+          return [...prevMessages, newMessage];
+        });
+      }
+    });
+
+    return () => {
+      socket.current.off('receive_group_message');
+    };
+  }, [selectedGroup]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -319,10 +349,18 @@ function Groups() {
     
     try {
       await axios.post(`${API_URL}/api/groups/${selectedGroup.id}/members`, {
-        username: newMemberUsername,
-        added_by: currentUser.username
-      });
+      // Fetch group messages
+      const messagesResponse = await axios.get(`${API_URL}/api/groups/${group.id}/messages`);
+      setGroupMessages(messagesResponse.data || []);
       
+      // Join socket room for this group
+      if (socket.current) {
+        socket.current.emit('join_group', { 
+          group_id: group.id, 
+          username: currentUser.username 
+        });
+      }
+    } catch (err) {
       setNewMemberUsername('');
       
       // Refresh group details
@@ -478,12 +516,12 @@ function Groups() {
                   <h3 className="empty-chat-title">No messages yet</h3>
                   <p className="empty-chat-subtitle">
                     Be the first to start a conversation in this group.
-                  </p>
-                </div>
-              ) : (
-                groupMessages.map(msg => (
-                  <div 
-                    key={msg.id}
+                    <div className="message-bubble">
+                      {msg.sender !== currentUser.username && (
+                        <div className="message-sender">@{msg.sender}</div>
+                      )}
+                      <div className="message-text">{msg.message}</div>
+                    </div>sg.id}
                     className={`message-item ${msg.sender === currentUser.username ? 'own-message' : ''}`}
                   >
                     <div className="message-bubble">
