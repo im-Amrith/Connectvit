@@ -701,7 +701,7 @@ def add_group_member(group_id):
         cursor.execute('''
             INSERT INTO group_members (group_id, username, joined_at, is_admin)
             VALUES (?, ?, ?, ?)
-        ''', (group_id, username, joined_at, False))
+        ''', (group_id, username, joined_at, 0))
         
         conn.commit()
         return jsonify({"message": "Member added successfully"}), 200
