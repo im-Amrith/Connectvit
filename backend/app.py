@@ -200,6 +200,15 @@ def create_tables():
         )
     ''')
 
+    # Enable RLS for Postgres to secure tables from public API access
+    if DATABASE_URL:
+        tables = ["users", "messages", "groups", "group_members", "group_messages", "posts", "post_likes"]
+        for table in tables:
+            try:
+                cursor.execute(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;")
+            except Exception as e:
+                print(f"⚠️ Could not enable RLS for {table}: {e}")
+
     conn.commit()
     conn.close()
 
