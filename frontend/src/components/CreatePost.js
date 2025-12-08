@@ -16,15 +16,12 @@ function CreatePost({ onPostCreated }) {
       const fileReader = new FileReader();
       
       fileReader.onload = (e) => {
-        setImagePreview(e.target.result);
+        const base64Image = e.target.result;
+        setImagePreview(base64Image);
+        setImageURL(base64Image);
       };
       
       fileReader.readAsDataURL(file);
-      
-      // For simplicity in this demo, we're storing the file as base64
-      // In a real app, you'd upload this to a server
-      // Instead, we'll just pretend it's a valid URL
-      setImageURL(`data:${file.type};base64,${file.name}`);
     }
   };
 

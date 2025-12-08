@@ -175,7 +175,7 @@ function PostCard({ post }) {
       </div>
       
       <div className="post-image-container">
-        <img src={post.imageUrl} alt="Post" className="post-image" />
+        <img src={post.image_url || post.imageUrl} alt="Post" className="post-image" />
       </div>
       
       <div className="post-actions">
