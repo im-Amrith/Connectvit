@@ -713,8 +713,53 @@ def add_group_member(group_id):
         if conn:
             conn.close()
 
-@app.route('/api/groups/<int:group_id>/messages', methods=['GET'])
-def get_group_messages(group_id):
+@app.route('/api/groups/<int:group_id>/messages', methods=['GET', 'POST'])
+def handle_group_messages(group_id):
+    if request.method == 'POST':
+        try:
+            data = request.json
+            sender = data.get("sender")
+            message_text = data.get("message")
+            timestamp = data.get("timestamp") or datetime.now().isoformat()
+            
+            if not sender or not message_text:
+                return jsonify({"error": "Sender and message are required"}), 400
+            
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            if DATABASE_URL:
+                cursor.execute('''
+                    INSERT INTO group_messages (group_id, sender, message, timestamp)
+                    VALUES (%s, %s, %s, %s) RETURNING id
+                ''', (group_id, sender, message_text, timestamp))
+                message_id = cursor.fetchone()[0]
+            else:
+                cursor.execute('''
+                    INSERT INTO group_messages (group_id, sender, message, timestamp)
+                    VALUES (?, ?, ?, ?)
+                ''', (group_id, sender, message_text, timestamp))
+                message_id = cursor.lastrowid
+            
+            conn.commit()
+            conn.close()
+            
+            new_message = {
+                "id": message_id,
+                "group_id": group_id,
+                "sender": sender,
+                "message": message_text,
+                "timestamp": timestamp
+            }
+            
+            # Also emit via socketio for real-time updates
+            socketio.emit('receive_group_message', new_message, room=f"group_{group_id}")
+            
+            return jsonify(new_message), 201
+        except Exception as e:
+            return jsonify({"error": "Failed to send message", "details": str(e)}), 500
+
+    # GET method
     try:
         conn = get_db_connection()
         cursor = get_cursor(conn)
