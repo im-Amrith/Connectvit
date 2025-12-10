@@ -516,19 +516,19 @@ function Groups() {
                   <h3 className="empty-chat-title">No messages yet</h3>
                   <p className="empty-chat-subtitle">
                     Be the first to start a conversation in this group.
-                    <div className="message-bubble">
-                      {msg.sender !== currentUser.username && (
-                        <div className="message-sender">@{msg.sender}</div>
-                      )}
-                      <div className="message-text">{msg.message}</div>
-                    </div>sg.id}
+                  </p>
+                </div>
+              ) : (
+                groupMessages.map(msg => (
+                  <div 
+                    key={msg.id}
                     className={`message-item ${msg.sender === currentUser.username ? 'own-message' : ''}`}
                   >
                     <div className="message-bubble">
                       {msg.sender !== currentUser.username && (
                         <div className="message-sender">@{msg.sender}</div>
                       )}
-                      <div className="message-text">{msg.content}</div>
+                      <div className="message-text">{msg.message || msg.content}</div>
                     </div>
                     <div className="message-time">
                       {formatDate(msg.timestamp)}
