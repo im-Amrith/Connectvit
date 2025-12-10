@@ -349,18 +349,10 @@ function Groups() {
     
     try {
       await axios.post(`${API_URL}/api/groups/${selectedGroup.id}/members`, {
-      // Fetch group messages
-      const messagesResponse = await axios.get(`${API_URL}/api/groups/${group.id}/messages`);
-      setGroupMessages(messagesResponse.data || []);
+        username: newMemberUsername,
+        added_by: currentUser.username
+      });
       
-      // Join socket room for this group
-      if (socket.current) {
-        socket.current.emit('join_group', { 
-          group_id: group.id, 
-          username: currentUser.username 
-        });
-      }
-    } catch (err) {
       setNewMemberUsername('');
       
       // Refresh group details
@@ -389,6 +381,14 @@ function Groups() {
       // Fetch group messages
       const messagesResponse = await axios.get(`${API_URL}/api/groups/${group.id}/messages`);
       setGroupMessages(messagesResponse.data || []);
+
+      // Join socket room for this group
+      if (socket.current) {
+        socket.current.emit('join_group', { 
+          group_id: group.id, 
+          username: currentUser.username 
+        });
+      }
     } catch (err) {
       console.error('Error fetching group data:', err);
       setError('Failed to load group details.');
