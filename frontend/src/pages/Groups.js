@@ -240,8 +240,7 @@ function Groups() {
       setUserGroups(prevGroups => prevGroups.map(g => 
         g.id === selectedGroup.id ? { ...g, messages: [...(g.messages || []), response.data] } : g
       ));
-      setSelectedGroup({ ...selectedGroup, messages: [...(selectedGroup.messages || []), response.data] });
-      setGroupMessages(prevMessages => [...prevMessages, response.data]);
+      
       setMessage('');
       
       // Process notifications for mentions
