@@ -1,70 +1,103 @@
-# Getting Started with Create React App
+# ConnectVit
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+ConnectVit is a modern social media application designed to connect people through real-time communication and content sharing. It features a robust chat system, interactive social feed, and community groups.
 
-## Available Scripts
+##  Features
 
-In the project directory, you can run:
+- **Real-time Messaging**: Instant 1-on-1 chats and group conversations powered by Socket.IO.
+- **Social Feed**: Share updates, photos, and thoughts with your network.
+- **Stories**: Share ephemeral moments with your friends.
+- **Groups**: Create and join communities based on shared interests.
+- **User Profiles**: Customizable profiles to showcase your identity.
+- **Notifications**: Stay updated with real-time alerts for interactions.
+- **Secure Authentication**: Robust login and signup system.
 
-### `npm start`
+##  Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Frontend
+- **React.js** (v18): Component-based UI library.
+- **React Router** (v7): Client-side routing.
+- **Socket.io-client**: Real-time bidirectional event-based communication.
+- **Axios**: Promise based HTTP client.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Backend
+- **Python (Flask)**: Lightweight WSGI web application framework.
+- **Flask-SocketIO**: Low latency bi-directional communications.
+- **Database**: 
+  - **SQLite**: Default for development.
+  - **PostgreSQL**: Supported for production environments.
+- **Authentication**: Bcrypt for secure password hashing.
 
-### `npm test`
+##  Getting Started
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Follow these instructions to get the project up and running on your local machine.
 
-### `npm run build`
+### Prerequisites
+- **Node.js** (v14 or higher)
+- **Python** (v3.8 or higher)
+- **pip** (Python package installer)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+###  Backend Setup
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Navigate to the backend directory:
+   `ash
+   cd backend
+   `
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Create a virtual environment (optional but recommended):
+   `ash
+   # Windows
+   python -m venv venv
+   .\venv\Scripts\activate
 
-### `npm run eject`
+   # macOS/Linux
+   python3 -m venv venv
+   source venv/bin/activate
+   `
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. Install dependencies:
+   `ash
+   pip install -r requirements.txt
+   `
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. Run the application:
+   `ash
+   python app.py
+   `
+   The backend server will start (default: http://localhost:5000).
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+###  Frontend Setup
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. Open a new terminal and navigate to the frontend directory:
+   `ash
+   cd frontend
+   `
 
-## Learn More
+2. Install dependencies:
+   `ash
+   npm install
+   `
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+3. Start the development server:
+   `ash
+   npm start
+   `
+   The application will open in your browser at http://localhost:3000.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+##  Configuration
 
-### Code Splitting
+### Backend
+Create a .env file in the ackend directory to configure your environment variables (optional for local dev with SQLite):
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+`env
+DATABASE_URL=postgresql://user:password@localhost/dbname
+SECRET_KEY=your_secret_key
+`
 
-### Analyzing the Bundle Size
+##  Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-### Making a Progressive Web App
+##  License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is open source and available under the [MIT License](LICENSE).
